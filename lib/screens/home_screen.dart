@@ -41,8 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     var readMaps = await ts.readAllTodos();
     setState(() {
       for (var m in readMaps) {
-        var t = Todo(
-            m["id"], m["task"], m["category"], m["date"]);
+        var t = Todo(m["id"], m["task"], m["category"], m["date"], m["finished"]);
         _todos.add(t);
       }
     });
@@ -148,6 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _todoTaskController.text,
                   _selectedCategory ?? -1,
                   _todoDateController.text,
+                  0
                 );
                 var ts = TodoService();
                 ts.saveTodo(id, todo);
@@ -180,6 +180,21 @@ class _HomeScreenState extends State<HomeScreen> {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
             child: ListTile(
+              leading: IconButton(
+                icon: _todos[index].finished == 0
+                    ? const Icon(Icons.check_box_outline_blank)
+                    : const Icon(Icons.check_box),
+                onPressed: () async {
+                  if (_todos[index].finished == 0) {
+                    _todos[index].finished = 1;
+                  } else {
+                    _todos[index].finished = 0;
+                  }
+                  var ts = TodoService();
+                  await ts.saveTodo(_todos[index].id, _todos[index]);
+                  setState(() {});
+                },
+              ),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[

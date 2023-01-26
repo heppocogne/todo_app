@@ -3,16 +3,15 @@ import 'package:todo_app/repositories/repository.dart';
 
 import '../models/todo.dart';
 
+class TodoService {
+  final Repository _repo = Repository("todos");
 
-class TodoService{
-  final Repository _repo=Repository("todos");
-
-  saveTodo(int todoID,Todo todo)async{
+  saveTodo(int todoID, Todo todo) async {
     Box box = await _repo.getBox();
     box.put(todoID, todo.todoMap());
   }
 
-  readAllTodos()async{
+  readAllTodos() async {
     Box box = await _repo.getBox();
     var todos = [];
     for (var key in box.keys) {

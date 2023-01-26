@@ -1,5 +1,5 @@
 class Todo{
-  Todo(this.id,this.task,this.category,this.date,{this.finished=0});
+  Todo(this.id,this.task,this.category,this.date,this.finished);
   int id;
   String task;
   int category;
