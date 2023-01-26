@@ -19,4 +19,9 @@ class TodoService {
     }
     return todos;
   }
+
+  deleteTodo(int todoID) async{
+    Box box = await _repo.getBox();
+    box.delete(todoID);
+  }
 }

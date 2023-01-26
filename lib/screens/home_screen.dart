@@ -41,7 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
     var readMaps = await ts.readAllTodos();
     setState(() {
       for (var m in readMaps) {
-        var t = Todo(m["id"], m["task"], m["category"], m["date"], m["finished"]);
+        var t =
+            Todo(m["id"], m["task"], m["category"], m["date"], m["finished"]);
         _todos.add(t);
       }
     });
@@ -142,13 +143,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               onPressed: () async {
                 int id = await idProvider.getNewTodoID();
-                var todo = Todo(
-                  id,
-                  _todoTaskController.text,
-                  _selectedCategory ?? -1,
-                  _todoDateController.text,
-                  0
-                );
+                var todo = Todo(id, _todoTaskController.text,
+                    _selectedCategory ?? -1, _todoDateController.text, 0);
                 var ts = TodoService();
                 ts.saveTodo(id, todo);
                 Navigator.pop(context);
@@ -158,6 +154,41 @@ class _HomeScreenState extends State<HomeScreen> {
                 ));
               },
               child: const Text("Create"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _deleteFormDialog(BuildContext context, int todoID) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Delete this task?"),
+          actions: <Widget>[
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              onPressed: () async {
+                var ts = TodoService();
+                ts.deleteTodo(todoID);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Deleted"),
+                ));
+              },
+              child: const Text("Delete"),
             ),
           ],
         );
@@ -199,12 +230,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(_todos[index].task),
+                  Text(_todos[index].date),
                 ],
               ),
               subtitle: Text((0 <= _todos[index].category)
                   ? _categories[_todos[index].category].name
                   : ""),
-              trailing: Text(_todos[index].date),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete),
+                color: Colors.red,
+                onPressed: () async {
+                  await _deleteFormDialog(context, _todos[index].id);
+                  getAllTodos();
+                },
+              ),
             ),
           );
         },
