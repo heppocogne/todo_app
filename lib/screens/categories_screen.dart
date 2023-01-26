@@ -19,24 +19,25 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   final IDProvider idProvider = IDProvider();
   final CategoryService _categoryService = CategoryService();
 
-  late List<Category> _categories = <Category>[];
+  List<Category> _categories = <Category>[];
 
   @override
   void initState() {
     super.initState();
     Future(() async {
       await getAllCategories();
-      setState(() {});
     });
   }
 
   getAllCategories() async {
     _categories = <Category>[];
     var readMaps = await _categoryService.readAllCategories();
-    for (var m in readMaps) {
-      var c = Category(m["id"], m["name"], m["description"]);
-      _categories.add(c);
-    }
+    setState(() {
+      for (var m in readMaps) {
+        var c = Category(m["id"], m["name"], m["description"]);
+        _categories.add(c);
+      }
+    });
   }
 
   _editCategory(BuildContext context, int categoryID) async {
@@ -49,8 +50,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   }
 
   _showFormDialog(BuildContext context) {
-    _categoryNameController.text="";
-    _categoryDescriptionController.text="";
+    _categoryNameController.text = "";
+    _categoryDescriptionController.text = "";
     return showDialog(
         context: context,
         barrierDismissible: false,
@@ -95,9 +96,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       _categoryDescriptionController.text);
                   await _categoryService.saveCategory(id, c);
                   Navigator.pop(context);
-                  setState(() {
-                    getAllCategories();
-                  });
+                  getAllCategories();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text("Saved"),
                   ));
@@ -155,9 +154,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       _editCategoryDescriptionController.text);
                   await _categoryService.saveCategory(categoryID, c);
                   Navigator.pop(context);
-                  setState(() {
-                    getAllCategories();
-                  });
+                  getAllCategories();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text("Updated"),
                   ));
@@ -191,9 +188,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 onPressed: () async {
                   await _categoryService.deleteCategory(categoryID);
                   Navigator.pop(context);
-                  setState(() {
-                    getAllCategories();
-                  });
+                  getAllCategories();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text("Deleted"),
                   ));
