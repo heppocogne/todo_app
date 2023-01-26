@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:todo_app/helpers/drawer_navigation.dart';
-import 'package:todo_app/screens/todo_screen.dart';
 import 'package:todo_app/service/category_service.dart';
 
 import '../models/category.dart';
 import '../models/todo.dart';
+import '../repositories/id_provider.dart';
 import '../service/todo_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,6 +16,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _todoTitleController = TextEditingController();
+  final _todoDescriptionController = TextEditingController();
+  final _todoDateController = TextEditingController();
+  final IDProvider idProvider = IDProvider();
+  var _selectedCategory; // Do not initialize this variable!
+  var _categoryItems = <DropdownMenuItem>[];
+  DateTime _dateTime = DateTime.now();
+
   List<Todo> _todos = <Todo>[];
   List<Category> _categories = <Category>[];
 
@@ -42,19 +51,128 @@ class _HomeScreenState extends State<HomeScreen> {
 
   getAllCategories() async {
     _categories = <Category>[];
-    var cs=CategoryService();
+    _categoryItems = <DropdownMenuItem>[];
+    var cs = CategoryService();
     var readMaps = await cs.readAllCategories();
     setState(() {
       for (var m in readMaps) {
         var c = Category(m["id"], m["name"], m["description"]);
         _categories.add(c);
+
+        _categoryItems.add(DropdownMenuItem(
+          value: m["id"],
+          child: Text(m["name"]),
+        ));
       }
     });
   }
 
-  _showAddDialog(BuildContext context)
-  {
+  _selectedTodoDate(BuildContext context) async {
+    var picked = await showDatePicker(
+      context: context,
+      initialDate: _dateTime,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
 
+    if (picked != null) {
+      setState(() {
+        _dateTime = picked;
+      });
+    }
+  }
+
+  _showAddDialog(BuildContext context) async {
+    _todoTitleController.text = "";
+    _todoDescriptionController.text = "";
+    _dateTime = DateTime.now();
+    _todoDateController.text = DateFormat("yyyy/MM/dd").format(_dateTime);
+    _selectedCategory = null;
+
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Create a new task"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  decoration: const InputDecoration(
+                    hintText: "Write a title",
+                    labelText: "Title",
+                  ),
+                  controller: _todoTitleController,
+                ),
+                TextField(
+                  decoration: const InputDecoration(
+                    hintText: "Write a description",
+                    labelText: "Description",
+                  ),
+                  controller: _todoDescriptionController,
+                ),
+                TextField(
+                  controller: _todoDateController,
+                  decoration: InputDecoration(
+                    labelText: "Date",
+                    hintText: "Pick a Date",
+                    prefixIcon: InkWell(
+                      onTap: () {
+                        _selectedTodoDate(context);
+                      },
+                      child: const Icon(Icons.calendar_today),
+                    ),
+                  ),
+                ),
+                DropdownButtonFormField(
+                  value: _selectedCategory,
+                  items: _categoryItems,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedCategory = value;
+                    });
+                  },
+                  hint: const Text("Category"),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+              ),
+              onPressed: () async {
+                int id = await idProvider.getNewTodoID();
+                var todo = Todo(
+                  id,
+                  _todoTitleController.text,
+                  _todoDescriptionController.text,
+                  _selectedCategory ?? -1,
+                  _todoDateController.text,
+                );
+                var ts = TodoService();
+                ts.saveTodo(id, todo);
+                Navigator.pop(context);
+                await getAllTodos();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Created"),
+                ));
+              },
+              child: const Text("Create"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -78,15 +196,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(_todos[index].title),
                 ],
               ),
-              subtitle: Text((0<=_todos[index].category)?_categories[_todos[index].category].name:""),
+              subtitle: Text((0 <= _todos[index].category)
+                  ? _categories[_todos[index].category].name
+                  : ""),
               trailing: Text(_todos[index].date),
             ),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
+        /*
         onPressed: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => TodoScreen())),
+            .push(MaterialPageRoute(builder: (context) => TodoScreen())),*/
+        onPressed: () async {
+          await getAllCategories();
+          await _showAddDialog(context);
+          setState(() {});
+        },
         child: const Icon(Icons.add),
       ),
     );
