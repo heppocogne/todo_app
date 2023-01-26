@@ -6,7 +6,7 @@ class IDProvider {
 
   final String categoriesKey = "categories_id";
 
-  Future<int> getNewCategoryID() async{
+  Future<int> getNewCategoryID() async {
     Box box = await _repo.getBox();
     if (box.containsKey(categoriesKey)) {
       int current = box.get(categoriesKey);

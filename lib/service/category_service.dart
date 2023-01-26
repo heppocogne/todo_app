@@ -12,4 +12,23 @@ class CategoryService {
     box.put(categoryID, category.categoryMap());
     return categoryID;
   }
+
+  readAllCategories() async {
+    Box box = await _categoriesRepo.getBox();
+    var categories = [];
+    for (var key in box.keys) {
+      categories.add(box.get(key));
+    }
+    return categories;
+  }
+
+  readCategory(int categoryID)async{
+    Box box = await _categoriesRepo.getBox();
+    return box.get(categoryID);
+  }
+
+  deleteCategory(int categoryID)async {
+    Box box = await _categoriesRepo.getBox();
+    return box.delete(categoryID);
+  }
 }

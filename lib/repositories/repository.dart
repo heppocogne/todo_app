@@ -7,11 +7,7 @@ class Repository {
   Box? _box;
 
   getBox() async {
-    if (_box != null) {
-      return _box;
-    } else {
-      _box = await Hive.openBox(boxName);
-      return _box;
-    }
+    _box ??= await Hive.openBox(boxName);
+    return _box;
   }
 }
