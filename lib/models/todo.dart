@@ -1,17 +1,15 @@
 class Todo{
-  Todo(this.id,this.title,this.description,this.category,this.date,{this.finished=0});
+  Todo(this.id,this.task,this.category,this.date,{this.finished=0});
   int id;
-  String title;
-  String description;
+  String task;
   int category;
   String date;
   int finished;
 
-  todotMap(){
+  todoMap(){
     Map<String, dynamic> mapping = {
       "id":id,
-      "title":title,
-      "description":description,
+      "task":task,
       "category":category,
       "date":date,
       "finished":finished,

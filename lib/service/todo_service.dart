@@ -9,7 +9,7 @@ class TodoService{
 
   saveTodo(int todoID,Todo todo)async{
     Box box = await _repo.getBox();
-    box.put(todoID, todo.todotMap());
+    box.put(todoID, todo.todoMap());
   }
 
   readAllTodos()async{

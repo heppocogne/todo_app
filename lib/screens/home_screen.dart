@@ -16,8 +16,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _todoTitleController = TextEditingController();
-  final _todoDescriptionController = TextEditingController();
+  final _todoTaskController = TextEditingController();
   final _todoDateController = TextEditingController();
   final IDProvider idProvider = IDProvider();
   var _selectedCategory; // Do not initialize this variable!
@@ -43,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       for (var m in readMaps) {
         var t = Todo(
-            m["id"], m["title"], m["description"], m["category"], m["date"]);
+            m["id"], m["task"], m["category"], m["date"]);
         _todos.add(t);
       }
     });
@@ -83,8 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _showAddDialog(BuildContext context) async {
-    _todoTitleController.text = "";
-    _todoDescriptionController.text = "";
+    _todoTaskController.text = "";
     _dateTime = DateTime.now();
     _todoDateController.text = DateFormat("yyyy/MM/dd").format(_dateTime);
     _selectedCategory = null;
@@ -100,17 +98,10 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 TextField(
                   decoration: const InputDecoration(
-                    hintText: "Write a title",
-                    labelText: "Title",
+                    hintText: "Write a task",
+                    labelText: "Task",
                   ),
-                  controller: _todoTitleController,
-                ),
-                TextField(
-                  decoration: const InputDecoration(
-                    hintText: "Write a description",
-                    labelText: "Description",
-                  ),
-                  controller: _todoDescriptionController,
+                  controller: _todoTaskController,
                 ),
                 TextField(
                   controller: _todoDateController,
@@ -154,8 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 int id = await idProvider.getNewTodoID();
                 var todo = Todo(
                   id,
-                  _todoTitleController.text,
-                  _todoDescriptionController.text,
+                  _todoTaskController.text,
                   _selectedCategory ?? -1,
                   _todoDateController.text,
                 );
@@ -193,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text(_todos[index].title),
+                  Text(_todos[index].task),
                 ],
               ),
               subtitle: Text((0 <= _todos[index].category)
