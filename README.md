@@ -1,16 +1,12 @@
 # todo_app
 
-My first todo list app.
+My first todo list app made with flutter.  
+This app is based on [these tutorial videos](https://www.youtube.com/playlist?list=PLjOFHn8uDrvT00AlU-zKJN4efsBN-OFOB) to some extent.  
+![image](https://user-images.githubusercontent.com/83043568/214842328-1d278629-b14d-4133-b420-681e84e93a13.png)
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Difference:
+- This app uses Hive instead of sqflite
+- Add check box
+- Add remove task button
+- "Create new task" form is dialog
